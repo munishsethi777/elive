@@ -1,0 +1,42 @@
+<?php
+require_once('../IConstants.inc');
+require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/WQDStackDataStore.php");
+require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/ChannelConfigurationDataStore.php");
+$fromFolderSeq = 48;
+$toFolderSeq = 200;
+$fromChNumbers = array(0=>12,1=>13);
+$toChNumber = "13";
+$INSERT = "insert into wqdstackfiledata(wqdfolderseq,wqdfiledatadated,wqdfiledatareportno,wqdfiledatachecksum,ch7value,ch7status,ch8value,ch8status)";
+$stackDataStore = WQDStackDataStore::getInstance();
+$configurationDataStore = ConfigurationDataStore::getInstance();
+$mclDataFromDateKeyName = ConfigurationDataStore::$mclDataInsertDateFrom;
+$fromDataFrom = $configurationDataStore->getConfiguration($mclDataFromDateKeyName);
+$finalLastDataTo = $configurationDataStore->getConfiguration(ConfigurationDataStore::$mclDataInsertDateTo);
+echo "From Date for insert is - ".$fromDataFrom;
+$dataArr = $stackDataStore->getChannelDataforInsert($fromDataFrom,$finalLastDataTo, $fromFolderSeq, $fromChNumbers);
+echo "<br>Found Total Rows - " . count($dataArr);
+$lastDataDate = $fromDataFrom;
+foreach($dataArr as $data){
+	$chArray = array();
+	$dataSeq = $data["wqdfiledataseq"];
+	$dataDated  = $data["wqdfiledatadated"];
+	$ch7Value  = $data["ch12value"];
+	$ch7Status = $data["ch12status"];
+
+	$ch8Value  = $data["ch13value"];
+	$ch8Status = $data["ch13status"];
+	
+	$dataReportNo  = $data["wqdfiledatareportno"];
+	$dataCheckSum  = $data["wqdfiledatachecksum"];
+	$lastDataDate = $dataDated;
+	try{
+		$values = "values($toFolderSeq,'$dataDated',$dataReportNo,$dataCheckSum,$ch7Value,$ch7Status,$ch8Value,$ch8Status)";
+		$query = $INSERT . $values;
+		//$stackDataStore->saveWithQuery($query);	
+	}catch (Exception $e){
+		echo "Error During Insert Data :- ".$e->getMessage();
+	}		
+}	
+$configurationDataStore->saveConfig($mclDataFromDateKeyName, $lastDataDate);
+echo "<br>Insert row for till Date -".$lastDataDate . "<br>Total Rows :- " . count($dataArr);
+?>

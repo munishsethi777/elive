@@ -1,0 +1,71 @@
+<?php
+require_once('IConstants.inc'); 
+require_once($ConstantsArray['dbServerUrl'] . "Utils/CPCBService.php");
+require($ConstantsArray['dbServerUrl'] . "DataStoreMgr//LocationDataStore.php");
+require_once($ConstantsArray['dbServerUrl'] . "Utils/CPCBService.php");
+$LDS = LocationDataStore::getInstance();
+$userSeqs = array(1=>51);
+$counter = 0;
+foreach($userSeqs as $userSeq){
+    try{
+         $locations = $LDS->FindBySeqs("38,52,55,56,64,65,66,69,60,44");
+		 //new stations starts from 60 onwards
+		 //71,20,54,19,50,70,72
+		 //$locations = $LDS->FindBySeqs("19");
+       	 foreach($locations as $location){
+			if($counter >= 1){
+				//continue;
+			}
+            $locationSeq = $location->getSeq();
+            $cpcbSerive = new CPCBService();
+            $vendorCode = "Bhoomi";
+            $detail = $cpcbSerive->getCPCBJson($locationSeq,$vendorCode);
+            $data = $detail["data"];
+            if(empty($data)){
+				echo("<br>\r\n No new data found for location ". $location->getLocationName());
+            	continue;
+            }
+			$counter++;
+            $data = json_encode($data);  
+			//echo("Request JSON :- " . $data . "<br>");			
+            $ch = curl_init();
+            //$CDS = ConfigurationDataStore::getInstance();
+            $url = "http://182.75.69.206:8080/v1.0/industry/". $locationSeq ."/data";
+			echo("<br> \r\n URL :- " . $url . "<br>");	
+            $username = "nayan@bhoomiltd.com";
+            $password = "bhoomi1986";
+            $auth_header = 'Authorization: Basic ' . base64_encode('e7626ae990fa426997a5bb888c9cb26e');
+			curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/Json', $auth_header));
+            curl_setopt($ch, CURLOPT_POST, TRUE);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+            curl_setopt($ch, CURLOPT_URL, $url);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+			curl_setopt($ch, CURLOPT_CONNECTTIMEOUT ,0); 
+            $result = curl_exec($ch);
+			$resultJson = json_decode($result); 
+            $msg = $resultJson->msg;
+            $status = $resultJson->status;
+            curl_close($ch);
+            echo($result);
+            if($status == 1 && $msg == "success"){
+            	$lastSyncedDates = $detail["lastsynceddates"];
+            	$FDS = FolderDataStore::getInstance();
+            	foreach ($lastSyncedDates as $key=>$value){
+            		$FDS->updateLastSyncedSeq($value, $key);
+					echo("<br>\r\n Updated till dated ".$key ." for ". $location->getLocationName() ." with seq ".$value . "<br>");
+            	}	
+            }else{
+				$subject = "Error During Send data to CPCB for location :- " . $locationSeq;
+	            MailerUtils::sendError($result, $subject,false);
+			}
+        }        
+    }catch(Exception $e){
+		echo("<br>\r\n Error occured while data synch ". $e->getMessage());
+        $subject = "Exception During Send data to CPCB ";
+    	MailerUtils::sendError($e->getMessage(), $subject,false); 
+    }
+    
+}
+
+
+?>

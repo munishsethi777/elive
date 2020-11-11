@@ -1,0 +1,209 @@
+ <?include("sessioncheck.php");
+  require_once('IConstants.inc');
+  require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr//ChannelConfigurationDataStore.php");
+  require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr//FolderDataStore.php");
+  require_once($ConstantsArray['dbServerUrl'] . "Utils/PrescribedLimitsUtils.php");
+  require_once($ConstantsArray['dbServerUrl'] . "Utils/CalibrationService.php");
+ 
+  $folderSeq = $_GET["folderSeq"];
+  $stationCode = $_GET["siteCode"];
+  $folder = new Folder();
+  //$disabled = "disabled";
+  $disabled = "";
+  if(!empty($folderSeq)){
+	  $folderDataStore = FolderDataStore::getInstance();
+	  $folder = $folderDataStore->FindBySeq($folderSeq);
+	  $chConfigDataStore = ChannelConfigurationDataStore::getInstance();
+	  $channels = $chConfigDataStore->FindByFolder($folderSeq);
+	  if($_GET["call"] == "getCalibrationData"){
+	    if($folderSeq == 38){
+	  		$folder->setM2MCode("NPL_A1_PB");
+	  	}else if($folderSeq == 39){
+	  		$folder->setM2MCode("NPL_A2_PB");
+	  	}  
+	  	$calibrationData = CalibrationService::getCallibrationData($folder->getM2MCode(),$channels);
+	  	echo $calibrationData;
+	  	return;
+	  }
+	  if(!empty($folder->getLoggerId())){
+	  	 $disabled = "";
+	  }
+  }
+  
+  if($_GET["call"] == "markCalibration"){
+  	$loggerId = $_GET["loggerId"];
+  	$cmd = $_GET["cmd"];
+  	$parameter = $_GET["parameter"];
+  	$isStart = $_GET["isStart"];
+  	$response = CalibrationService::makeCalibrationCall($loggerId, $parameter,$cmd, $isStart);
+  	echo $response;
+  	return;
+  }
+  ?>
+<!DOCTYPE html>
+<html>
+    <head>
+    <? include("manage/_jsAdminInclude.php");?>
+    <?include("_InspiniaInclude.php");?>
+    </head>
+    <body>
+      <div id="wrapper">       
+            <div class="wrapper wrapper-content animated fadeInRight mainDiv">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="ibox float-e-margins">
+                            <div class="ibox-title">
+                                <h2><?php echo $folder->getFolderName()?> <small> - Remote Calibration</small></h2>
+                                <div>Last Data Syched On - <span id="lastDataSync"></span></div>
+                            </div>
+                            <div class="ibox-content">
+                                <div>
+                                    <form name="frm1" id="calfrm1" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" class="form-horizontal">
+                                    <tr>
+                                        <td><a href="javascript:submitForm('zero','',1)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Zero</button></a></td>
+                                        <td style="margin-left:20px">
+                                            <a href="javascript:submitForm('span','',1)"><button id="span" <?php echo $disabled ?> class="btn btn-primary" type="button">Span Start</button></a>
+                                            <a href="javascript:submitForm('span','',0)"><button  <?php echo $disabled ?> class="btn btn-primary" type="button">Span Stop</button></a>
+                                        </td>
+                                        <td style="margin-left:20px">
+                                            <a href="javascript:submitForm('purge','',1)"><button id="purge" <?php echo $disabled ?> class="btn btn-primary" type="button">Purge Start</button></a>
+                                            <a href="javascript:submitForm('purge','',0)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Purge Stop</button></a>
+                                        </td>
+                                    </tr>
+                                    </form>
+                                </div>
+                                 <form name="frm11" id="calfrm11" method="post" action="<?php echo $_SERVER['PHP_SELF']; ?>" class="form-horizontal">
+	                                 <input type="hidden" name="call" id="call" value="markCalibration" >
+	                                 <input type="hidden" name="loggerId" id="loggerId" value="<?php echo $folder->getLoggerId()?>" >
+	                                 <input type="hidden" name="stationCode" id="stationCode" value="<?php echo $stationCode?>" >
+	                                 <input type="hidden" name="folderSeq" id="folderSeq" value="<?php echo $folderSeq?>" >
+	                                 <input type="hidden" name="calCmdValue" id="calCmdValue" >
+	                                 <input type="hidden" name="lastRuleHitFileDataSeq" id="seq" value="">
+                                   	 <div class="ibox-content">
+			                            <div class="table-responsive">
+			                                <table class="table table-striped">
+			                                    <thead>
+			                                    <tr>
+			                                        <th>Component </th>
+			                                        <th>Unit </th>
+			                                        <th>Concentration Value</th>
+			                                        <th>Status</th>
+			                                        <th>Calibration Gas</th>
+			                                        <th>Analyzer Range</th>
+			                                        <th>Analyzer Status</th>
+			                                        <!--<th>Zero Calibration</th>
+			                                        <th>Span Calibration</th>
+			                                        <th>Zero Purge</th>-->
+			                                        <th>Calibration Status</th>
+			                                    </tr>
+			                                    </thead>
+			                                    <tbody>
+			                                    <?php foreach ($channels as $ch){
+			                                        
+			                                    	$presLimits = PrescribedLimitsUtils::getPrescribedLimit($ch->getChannelName(),$folder->getStationType());
+			                                    	$highValue = $presLimits["max"];
+			                                    	$chName = $ch->getChannelName();
+			                                    	if($chName != "Sox" && $chName != "Nox"){
+			                                    	    continue;
+			                                    	}
+			                                    	$chNumber = $ch->getChannelNumber();
+			                                    	if(!empty($ch->getChannelStation())){
+			                                    		$chName = $ch->getChannelStation() . "." . $ch->getChannelName(); 
+			                                    	}
+			                                   	?>
+				                                    <tr>
+				                                        <td><?php echo $chName ?></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "unit"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "conValue"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "conStatus"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "calGas"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "analyzerRange"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <td><span class="calData" id="<?php echo $chNumber . "analyzerStatus"?>"><i class="fa fa-spinner"></i></span></td>
+				                                        <!--<td><a href="javascript:submitForm('zero','<?php //echo $chName?>',1)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Zero</button></a></td>
+				                                        <td>
+				                                            <a href="javascript:submitForm('span','<?php //echo $chName?>',1)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Span Start</button></a>
+				                                            <a href="javascript:submitForm('span','<?php //echo $chName?>',0)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Span Stop</button></a>
+				                                        </td>
+				                                        <td>
+				                                            <a href="javascript:submitForm('purge','<?php //echo $chName?>',1)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Purge Start</button></a>
+				                                            <a href="javascript:submitForm('purge','<?php //echo $chName?>',0)"><button <?php echo $disabled ?> class="btn btn-primary" type="button">Purge Stop</button></a>
+				                                        </td>-->
+				                                        <td><span id="<?php echo $chNumber . "calibrationStatus"?>"><i class="fa fa-spinner"></i></span></td>
+				                                    </tr>
+			                                   <?php }?>
+			                                    </tbody>
+			                                </table>
+			                            </div>
+										<div id="parameters"></div>
+										<div id="values"></div>
+	                        		</div>
+                                 </form>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+             </Div>
+        </Div>
+    </body>
+</html>
+<script type="text/javascript">
+     $(document).ready(function () {
+        $('.i-checks').iCheck({
+            checkboxClass: 'icheckbox_square-green',
+            radioClass: 'iradio_square-green',
+        });
+        loadCalibrationData()
+        setInterval(loadCalibrationData,60000);
+        
+     });
+     function startCalibration(){
+         alert("Calibration Started");
+     }
+     function submitForm(cmd,parameter,isStart){
+        var loggerId = $("#loggerId").val();
+        if(isStart){
+        	$("#"+cmd).addClass('btn-danger');
+        }else{
+        	$("#"+cmd).removeClass("btn-danger"); 
+        }
+        //return;
+        $url = "calibrationStation.php?call=markCalibration&cmd="+cmd+"&loggerId="+loggerId+"&parameter="+parameter+"&isStart="+isStart;
+     	$.getJSON($url, function(data){
+         	var message = data.message;
+         	var success = "failed"
+         	if(data.success == 1){
+         		success = "success";
+         		loadCalibrationData();		 	
+         	}
+         	showNotification(message,success);
+     	})
+     }
+     function loadCalibrationData(){
+    	$(".calData").html('<i class="fa fa-spinner"></i>'); 
+    	$("#parameters").html("");
+   		 $("#values").html("");
+        var folderSeq = $("#folderSeq").val();
+        var siteCode = $("#stationCode").val();
+    	$url = "calibrationStation.php?call=getCalibrationData&folderSeq="+folderSeq+"&siteCode="+siteCode;
+ 		$.get($url, function(data){
+ 			loadTableData(data);
+ 		})
+     }
+     function loadTableData(jsonString){
+         	 var jsonData = $.parseJSON(jsonString);
+         	 var data = jsonData.data
+         	 var lastDataDate = jsonData.lastSynchedDate;
+         	 $.each(data, function(index , response){
+            	 $("#"+index+"unit").text(response.unit);
+            	 $("#"+index+"conValue").text(response.gasconcentrationvalue);
+            	 $("#"+index+"conStatus").text(response.gasconcentrationstatus);
+            	 $("#"+index+"calGas").text(response.calgas);
+            	 $("#"+index+"analyzerRange").text(response.anlyzerrange);
+            	 $("#"+index+"analyzerStatus").text(response.anlyzerstatus);
+            	 $("#"+index+"calibrationStatus").text("--");
+            	 //$("#parameters").html(response.parameters);
+            	 //$("#values").html(response.values);
+        	 });
+        	 $("#lastDataSync").html(lastDataDate);
+     }
+</script>

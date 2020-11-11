@@ -1,0 +1,38 @@
+body{
+    font: 12px "Trebuchet MS", sans-serif; 
+    margin: 50px; 
+    background-color:#F8F8F8; 
+    margin-top:5px
+}
+.leftButton{
+    padding:5px 5px 5px 5px;
+    display:block;
+    margin-bottom:5px;
+}
+.leftChildButton{
+    margin-left:20px;
+}
+.leftButtonPanel{
+   width:15%; 
+   float:left;
+   display:block;
+   background:white;
+   min-height:600px;
+}
+.rightAdminPanel{
+   float:right;
+   background:white;
+   width:85%;
+   min-height:600px;
+}
+.logoutButton{
+  float:right;
+  padding:4px 4px 4px 4px;
+}
+.AddFolderDiv{
+    margin:5px 5px 5px 5px;
+}
+
+.required{
+color:#FF0000;
+}

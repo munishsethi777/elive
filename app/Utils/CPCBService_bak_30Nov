@@ -1,0 +1,162 @@
+<?php
+    require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/FolderDataStore.php");
+    require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/WQDStackDataStore.php"); 
+    require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/ChannelConfigurationDataStore.php");   
+    class CPCBService{
+        private $postArray;
+        private $stackDataList;
+        private $channelArray;
+        private $lastSyncedSeq;
+        private static $cbcbService;
+        private static $allStations;
+        private static $totalChannelsForAll;
+        private static $WQDDS;
+        private $hasPendingCpcbData;
+        public static function getInstance(){
+        	//if(empty(self::$cbcbService)){
+        		self::$cbcbService = new CPCBService();
+        		$ccds = ChannelConfigurationDataStore::getInstance();
+        		$fds = FolderDataStore::getInstance();
+        		self::$allStations = $fds->getAllStationsForCPCBApi();
+        		self::$totalChannelsForAll = $ccds->getCountByAllStation();
+        		self::$WQDDS = WQDStackDataStore::getInstance();
+        	//}
+        	return self::$cbcbService;
+        }
+        
+        public function getCPCBJson($locationSeq,$vendorCode){
+        	$this->hasPendingCpcbData = array();
+            //$fds = FolderDataStore::getInstance();
+           // $ccds = ChannelConfigurationDataStore::getInstance();
+           // $stations = $fds->FindByLocation($locationSeq);
+            $this->postArray = array();
+            $lastSyncedArr = array();
+            $stations = self::$allStations[$locationSeq];
+            if(empty($stations)){
+            	//echo("<br>\r\n No station found for location ". $locationSeq);
+            	return ;
+            }
+            foreach($stations as $station){
+            	echo("<br>\r\n Has Pending CPCB flag is ". $station->getHasPendingCpcbData() . " for station - ".  $station->getSeq());
+               // $stationType = $station->getStationType();
+                $lastSeq = $station->getLastSyncedSeq();
+               // if($stationType == "aqms"){
+               //     continue;
+              //  }
+                $stationSeq = $station->getSeq();
+                $totalChannels = self::$totalChannelsForAll[$station->getSeq()];
+                $limit = floor(40/$totalChannels);
+                if($limit == 0)$limit = 40;
+                $deviceId = $vendorCode ."_".$locationSeq;
+                $this->stackDataList = self::$WQDDS->getChannelsInfo($stationSeq,$lastSeq,$limit);
+                if((count($this->stackDataList)) == $limit){
+                	$this->hasPendingCpcbData[$stationSeq] = 1;
+                }else{
+                	$this->hasPendingCpcbData[$stationSeq] = 0;
+                }
+                if(empty($this->stackDataList)){
+                    continue;
+                }
+                $this->getArray($station,$deviceId,false);
+                $lastSyncedArr[$stationSeq] = $this->lastSyncedSeq;
+                //$fds->updateLastSyncedSeq($this->lastSyncedSeq, $stationSeq);
+            }
+            $mainArr["data"] = $this->postArray;
+            $mainArr["lastsynceddates"] = $lastSyncedArr;
+            $mainArr["hasPendingCpcbData"] = $this->hasPendingCpcbData;
+            return  $mainArr;
+        }
+
+        
+        
+        public function getCPCBJsonOLD_NO_LIMITS($locationSeq,$vendorCode){
+        	$fds = FolderDataStore::getInstance();
+            $ccds = ChannelConfigurationDataStore::getInstance();
+            $stations = $fds->FindByLocation($locationSeq);
+            $this->postArray = array();  
+            $lastSyncedArr = array();
+			$WQDDS = WQDStackDataStore::getInstance();
+            foreach($stations as $station){
+            	$stationType = $station->getStationType();
+				$lastSeq = $station->getLastSyncedSeq();
+            	if($stationType == "aqms"){
+            		continue;
+            	}                
+                $stationSeq = $station->getSeq();
+                $deviceId = $vendorCode ."_".$locationSeq;
+                $this->stackDataList = $WQDDS->getChannelsInfo($stationSeq,$lastSeq);              
+                if(empty($this->stackDataList)){
+                	continue;
+                }                
+                $this->getArray($station,$deviceId,false);             
+                $lastSyncedArr[$stationSeq] = $this->lastSyncedSeq;
+                //$fds->updateLastSyncedSeq($this->lastSyncedSeq, $stationSeq);
+            }
+            $mainArr["data"] = $this->postArray;
+            $mainArr["lastsynceddates"] = $lastSyncedArr;
+            return  $mainArr;               
+        }
+        
+        private function getArray($station,$deviceId,$isChild){
+        	$stationSeq =  $station->getSeq();
+        	$fds = FolderDataStore::getInstance();
+        	$ccds = ChannelConfigurationDataStore::getInstance();
+        	$childStations = $fds->FindChildStations($stationSeq);
+        	$channels = array();
+        	if(!empty($childStations)){
+        		foreach($childStations as $childStation){
+        			$stationSeq = $childStation->getSeq();
+                    //if($stationSeq == 229 || $stationSeq ==230)
+                        //continue;
+        			$this->channelArray = $ccds->FindByChGroup($stationSeq);        			
+        			$this->getArray($childStation,$deviceId,true);        			
+        		}
+        		return;
+        	}        	
+        	$dataMainArr = array();
+        	if(!$isChild){
+        		$channels = $ccds->FindByFolderSeq($stationSeq);
+        	}else{
+        		$channels = $this->channelArray;
+        	}        	
+        	$deviceId = $deviceId . "_" . $stationSeq;
+        			$chDataArr = $this->stackDataList;
+        			$diagnosticsMainArr = array();
+        			foreach($channels as $channel){
+        				$isVisible = $channel->getIsVisible();
+        				if(empty($isVisible)){
+        					continue;
+        				}
+        				$paramsMainArr = array();      
+        				$device = $channel->getDeviceId();
+        				foreach ($chDataArr as $chData){
+        					$date = $chData["dated"];
+        					$date = DateTime::createFromFormat("Y/m/d H:i:s", $date);
+        					$timestamp = $date->getTimestamp();
+        					$channelInfo = $chData["channelsInfo"];
+        					$chName = $channel->getChannelRealName();
+        					if(empty($chName)){
+        						$chName = $channel->getChannelName();
+        					}
+        					$chName = strtolower($chName);	        				
+	        				$chNo = $channel->getChannelNumber();
+	        				$chUnit = $channel->getChannelUnit();
+	        				$chValue = $channelInfo["ch".$chNo."value"];
+	        				$param = array("parameter"=>$chName,
+	        						"value"=>$chValue,
+	        						"unit"=>$chUnit,
+	        						"timestamp"=> $timestamp . "000",
+	        						"flag"=>"U");
+	        				$diagnostics = array();
+	        				array_push($paramsMainArr, $param);
+	        				$this->lastSyncedSeq = $chData["seq"];
+	        			  
+        			}		
+        			$data = array("deviceId"=>$device, "params"=>$paramsMainArr,"diagnostics"=>$diagnosticsMainArr);
+        			array_push($dataMainArr, $data);
+        		}
+        	$post = array("stationId"=>$stationSeq, "data"=> $dataMainArr);
+        	array_push($this->postArray, $post);        	
+        }
+    }
+?>

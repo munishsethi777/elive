@@ -1,0 +1,151 @@
+    #parameterCheckSpan{
+         width:135px;float:left;height:16px;
+    }
+    #infoType,#graphType,#exportType{
+        margin:6px 0px 3px 6px;
+        float:left;
+    }
+
+    .locationsSelect,.stationsSelect,.pollutantSelect{
+        /*text-transform: uppercase;*/
+        font-size:12px;
+        margin-top:5px;
+    }
+    .buttonSmall{
+        font-size:10px;
+        padding:0px;
+    }
+    .formLabel{
+        width:100px;
+        display:block;
+        float:left
+    }
+    .channelsDiv{
+        font-size:11px;
+        float:left;
+    }
+
+
+    .stationsTab { margin-top: 1em; }
+    .stationsTab li .ui-icon-close { float: left; cursor: pointer; }
+    .stationsTab .ui-tabs-nav{padding:0px;}
+    .stationsTab .ui-tabs-nav li a{padding:2px 4px 2px 4px;}
+    .stationsTab .ui-tabs-panel{padding:0px;}
+    .parameterCheckSpan{font-size:10px;display:inline-flex;width:150px;margin-right: 10px;}
+    .valueTypeRadioLabel{font-size:11px;}
+
+    .odd{
+        background-color:white;
+    }
+    .even{
+        background-color:#EEE;
+    }
+    .odd td,.even td{
+       padding:5px 0px 5px 0px;
+    }
+    .stationReportTable{
+        margin:3px;		clear:both;
+    }
+    .stationReportTable .tableHeader{
+        padding:3px;
+        background-color: rgb(236, 236, 236);
+        border:1px solid silver;
+        color:rgb(56, 55, 55);
+        font-size:11px !important;
+        text-align:left;
+    }
+    .stationReportTable td{
+        color:rgb(63, 63, 63);
+padding:4px;
+    }
+    .recentReportStation{
+        border:1px silver solid;
+        margin:10px;
+        padding:0px 10px 10px 10px;
+    }
+    .recentReportStation .stationReportTable{
+        margin:0px !important;
+    }
+    .recentReportStation .stationReportTable td{
+        padding:3px !important;
+    }
+    .recentReportStationTitle{
+        margin-bottom:0px;
+        padding:3px
+    }
+    #toTop {
+        width:100px;
+        border:1px solid #ccc;
+        background:#f7f7f7;
+        text-align:center;
+        padding:5px;
+        position:fixed; /* this is the magic */
+        bottom:10px; /* together with this to put the div at the bottom*/
+        right:10px;
+        cursor:pointer;
+        display:none;
+        color:#333;
+        font-family:verdana;
+        font-size:11px;
+    }
+    table.stationReportTable td a{
+        cursor: pointer;
+    }
+    table.stationReportTable td a:hover{
+        text-decoration:underline;
+    }
+    .linkSmall{
+        text-decoration:underline;
+        cursor: pointer;
+    }
+    /*Comments Forms*/
+    .commentTable .formLabel{
+        font-size:16px;
+
+    }
+
+    .comentsMasterFormTable,.commentsMasterTable{
+        margin-bottom:6px;
+        font-size:12px;
+        font-family:arial
+    }
+    .comentsMasterFormTable td,.comentsMasterFormTable th,
+    .commentsMasterTable td, .commentsMasterTable th{
+        border:thin silver solid;
+        padding:1px 15px 1px 15px;
+    }
+    .commentsMasterTable td, .commentsMasterTable th{
+        border:thin silver solid;
+        padding:1px 15px 1px 15px;
+        cursor:pointer;
+    }
+    .comentsMasterFormTable th,
+    .commentsMasterTable th{
+        text-align:left;
+    }
+    .deleteCommentMaster,.viewCommentsDetails,.saveCommentsDetails{
+        cursor: pointer;
+        text-decoration:underline;
+        color:blue;
+    }
+    .valueTypeRadioLabel .ui-button-text,
+    .exceedingTypeRadioLabel .ui-button-text,
+    .isExceedingLabel{
+        font-size:11px !important;
+    }
+
+    .noExceeding{
+        background:none;
+    }
+    .exceedingAbove{
+        background:red;
+    }
+    .exceedingAbove a{
+        color:white;
+    }
+    .exceedingBelow{
+        background:yellow;
+    }
+    tr.boldRow td{
+        font-weight:bold;
+    }

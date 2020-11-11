@@ -1,0 +1,104 @@
+<?php
+require_once('IConstants.inc'); 
+require_once($ConstantsArray['dbServerUrl'] . "Utils/CPCBService.php");
+require($ConstantsArray['dbServerUrl'] . "DataStoreMgr//LocationDataStore.php");
+require_once($ConstantsArray['dbServerUrl'] . "Utils/MailerUtils.php");
+require_once($ConstantsArray['dbServerUrl'] . "DataStoreMgr/ConfigurationDataStore.php");
+require_once($ConstantsArray['dbServerUrl'] .'/log4php/Logger.php');
+Logger::configure('/home/envirote/public_html/app/log4php/log4php.xml');
+$logger = Logger::getLogger("CronAPIDailyLogger");
+
+$LDS = LocationDataStore::getInstance();
+$FDS = FolderDataStore::getInstance();
+$bhoomiLocations = "151";
+$eliveLocations = "0";
+
+       
+//Ezone Stations
+//Stopped Station --  33
+$vendorLocations = array("Bhoomi"=>$bhoomiLocations);
+$cc = ConfigurationDataStore::getInstance();
+$errMessage = "";
+$COUNT = 100;
+$delayLocations = array(151);
+$cpcbSerive = CPCBService::getInstance();
+foreach($vendorLocations as $vendorKey=>$value){
+    try{
+        	$locations = $LDS->FindBySeqs($value);
+			foreach($locations as $location){
+	            $locationSeq = $location->getSeq();
+	            $vendorCode = $vendorKey;
+	            $counter = 1;
+	            if(in_array($locationSeq, $delayLocations)){
+	            	$counter = $COUNT;
+	            }
+	            for($i=0;$i<$counter;$i++){
+	            	$cpcbSerive =   CPCBService::getInstance();
+	            	$lastSeq = $cc->getConfiguration("mcl2croner");
+	            	if($lastSeq >= 31326540){
+	            		MailerUtils::sendEmail("munishsethi777@gmail.com", "noreply@envirotechlive.com", "MCL2 reached final leg", "MCL2 has covered final leg data");
+	            		die;
+	            	}
+	            	$detail = $cpcbSerive->getCPCBJsonOLD_NO_LIMITS($locationSeq,$vendorCode,$lastSeq);
+	            	$data = $detail["data"];
+                    foreach($data as $key=>$value){
+                        unset($data[$key]["hoursDiff"]);
+                        unset($data[$key]["updatedTill"]);
+                    }
+	            	$data = json_encode($data);
+                    //var_dump($detail);
+	            	//echo("<br>Request :- ".$data);
+	            	$ch = curl_init();
+	            	$url = "http://182.75.69.206:8080/v1.0/industry/". $locationSeq ."/data";
+	            	echo("<br> \r\n URL :- " . $url . "<br>");
+	            	$apiKey = "e7626ae990fa426997a5bb888c9cb26e";
+	            	$auth_header = 'Authorization: Basic ' . base64_encode($apiKey);
+	            	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/Json', $auth_header));
+	            	curl_setopt($ch, CURLOPT_POST, TRUE);
+	            	curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+	            	curl_setopt($ch, CURLOPT_URL, $url);
+	            	curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+	            	//commented temp
+                    $result = curl_exec($ch);
+	            	if(!empty(curl_error($ch))){
+	            		echo 'error:' . curl_error($ch);
+	            	}
+                    $resultJson = json_decode($result);
+	            	$msg = $resultJson->msg;
+	            	$status = $resultJson->status;
+	            	curl_close($ch);
+	            	echo($result);
+	            	$hasError = false;
+	            	//if($status == null){
+	            	if($status == 1 && $msg == "success"){
+	            		$lastSyncedDates = $detail["lastsynceddates"];
+	            		foreach ($lastSyncedDates as $key=>$value){
+	            			$lastSeq = $cc->saveConfig("mcl2croner",$value);
+                            echo ("Updated till ". $value);
+                            //$logger->info("MCL2 is now uploaded till". $value);
+
+	            		}
+	            	}else{
+	            		$locationName = $location->getLocationName();
+	            		$request = "Location Name :- ".$locationName . "<br>";
+	            		$request .= "<br>Request :- ".$data . "<br>";
+	            		$response = "<br>Response :- ".$result . "<br>";
+	            		$message = $request . $response;
+	            		$subject = "Error During Send data to CPCB for location :- " . $locationSeq;
+	            		$errMessage .= $message;
+	            		$hasError = true;
+	            		
+	            	}
+	            	
+	            }    
+       	 }        
+    }catch(Exception $e){    	
+    	echo("<br>\r\n Error occured Cron API :- ". $e->getMessage());
+        MailerUtils::sendError($e->getMessage(), $subject,false);
+    }
+    
+}
+    if($errMessage != ""){
+        MailerUtils::sendError($errMessage, "Error During Send data to CPCB",false);
+    }
+?>

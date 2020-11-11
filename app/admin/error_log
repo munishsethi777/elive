@@ -1,0 +1,27 @@
+[28-Dec-2015 12:58:51 Asia/Kolkata] PHP Catchable fatal error:  Object of class DateTime could not be converted to string in /home/envirote/public_html/app/DataStoreMgr/M2MSynchronizerDataStore.php on line 241
+[28-Dec-2015 13:01:26 Asia/Kolkata] PHP Catchable fatal error:  Object of class DateTime could not be converted to string in /home/envirote/public_html/app/DataStoreMgr/M2MSynchronizerDataStore.php on line 241
+[28-Dec-2015 13:07:05 Asia/Kolkata] PHP Catchable fatal error:  Object of class DateTime could not be converted to string in /home/envirote/public_html/app/DataStoreMgr/M2MSynchronizerDataStore.php on line 241
+[02-Jan-2016 14:14:55 Asia/Kolkata] PHP Fatal error:  Call to a member function getStationType() on null in /home/envirote/public_html/app/admin/editParameter.php on line 65
+[23-Jan-2016 15:08:51 Asia/Kolkata] PHP Fatal error:  Call to a member function setChannelName() on null in /home/envirote/public_html/app/admin/editParameter.php on line 86
+[17-Feb-2016 14:27:13 Asia/Kolkata] PHP Fatal error:  Call to a member function setChannelName() on null in /home/envirote/public_html/app/admin/editParameter.php on line 86
+[17-Feb-2016 14:27:37 Asia/Kolkata] PHP Fatal error:  Call to a member function setChannelName() on null in /home/envirote/public_html/app/admin/editParameter.php on line 86
+[17-Feb-2016 14:29:21 Asia/Kolkata] PHP Fatal error:  Call to a member function setChannelName() on null in /home/envirote/public_html/app/admin/editParameter.php on line 86
+[11-Mar-2016 16:46:51 Asia/Kolkata] PHP Warning:  Invalid argument supplied for foreach() in /home/envirote/public_html/app/admin/editParameter.php on line 73
+[26-Aug-2016 14:36:00 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/adminTabs.php on line 2
+[21-Sep-2016 06:54:07 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[26-Sep-2016 12:18:24 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[01-Oct-2016 19:35:06 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[07-Oct-2016 03:34:42 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[12-Oct-2016 20:37:20 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[19-Oct-2016 18:50:49 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[26-Oct-2016 16:51:06 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[03-Nov-2016 02:29:02 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[11-Nov-2016 23:54:04 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[22-Nov-2016 02:59:04 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[02-Dec-2016 04:16:41 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[13-Dec-2016 04:09:06 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[24-Dec-2016 13:09:58 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[05-Jan-2017 19:31:27 Asia/Kolkata] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[18-Jan-2017 16:04:11 Asia/Calcutta] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[26-Jan-2017 23:13:39 Asia/Calcutta] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
+[26-Jan-2017 23:13:40 Asia/Calcutta] PHP Parse error:  syntax error, unexpected '<' in /home/envirote/public_html/app/admin/_jsAdminInclude.php on line 2
