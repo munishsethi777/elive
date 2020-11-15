@@ -139,11 +139,11 @@ try{
         $isSentSMS = false;
         $guid = null;
         if($mobileNumber != ""){
-            $smsMessage = "SMS Alert from CPCB";						
+//             $smsMessage = "SMS Alert from CPCB";						
             $mailMessage .= "\r\n<br>& " . $cpcbEmails;
-            $smsMessage .= $mailMessage;
+            $smsMessage = $mailMessage;
             $smsMessage = str_replace("<br>","",$smsMessage);
-            $smsMessage = str_replace("µg/m³","mg/nm3",$smsMessage);
+            $smsMessage = str_replace("ï¿½g/mï¿½","mg/nm3",$smsMessage);
             $vendor = $folder->getStationVendor();
 			if(!empty($vendor)){
 				$vendor = strtolower($vendor);

@@ -49,9 +49,11 @@ class SMSApiUtils{
 	public function sendSMSByVendor($receipientNo,$msg,$vendor){
 		switch ($vendor){
 			case "bhoomi":
+			    $msg = "SMS Alert from BHOOMI ANALYZER ".$msg;
 				return $this->sendSMSBhoomi($receipientNo, $msg);				//return this->sendSMS($receipientNo, $msg);
 				break;
 			case "envirozone":
+			    $msg = "SMS Alert from ENVIROZONE ".$msg;
  				return $this->sendSMSEnvirozone($receipientNo, $msg);
 // 				break;
 // 			case "elive" :
@@ -64,6 +66,7 @@ class SMSApiUtils{
 // 				$this->sendSMSHeat();
 // 				break;
 			default:
+			    $msg = "SMS Alert from ELIVE ".$msg;
 				return $this->sendSMS($receipientNo, $msg);
 		}
 	}
