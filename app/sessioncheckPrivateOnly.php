@@ -6,7 +6,7 @@
    session_start();
    if($_SESSION["userlogged"]==""){
         $_SESSION['httpUrl'] = $_SERVER['REQUEST_URI'];
-        header("location: login.php");
+        header("location: index.php");
         die;
    }else{
         $userLogged = $_SESSION["userlogged"];
