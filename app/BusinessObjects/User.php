@@ -4,6 +4,7 @@
       private $seq,$username,$password,$emailid,$dateofregistration,$isactive,$fullName,$confirmPassword,$decodedPassword;
       private $locationSeq, $folderSeq, $isManager, $locationName,$mobile,$otherLocationSeqs;
       private $otp,$otpemailid,$otpgeneratedate;
+      private $loginotp,$loginotpgeneratedate;
       
       public function setSeq($seq_){
         $this->seq = $seq_;
@@ -140,6 +141,18 @@
      */
     public function setOTPGenerateDate($otpgeneratedate){
       $this->otpgeneratedate = $otpgeneratedate;
+    }
+    public function getLoginOTP(){
+        return $this->loginotp;
+    }
+    public function setLoginOTP($otp){
+        $this->loginotp = $otp;
+    } 
+    public function getLoginOTPGenerateDate(){
+      return $this->loginotpgeneratedate;
+    }
+    public function setLoginOTPGenerateDate($otpgeneratedate){
+      $this->loginotpgeneratedate = $otpgeneratedate;
     }
   }
 ?>

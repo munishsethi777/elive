@@ -36,6 +36,8 @@ where lu.userseq = :userseq";
     private Static $GET_ALL_STATION_TYPE = "select distinct f.stationtype from folder f inner join locationusers lu on f.locationseq  = lu.locationseq where lu.userseq = :userseq";
     private static $INSERT_LOCATION_USER = "insert into locationusers (locationseq,userseq,permission) Values(:locationseq ,:userseq ,:permission)";
     private static $UPDATE_OTP = "UPDATE user set otp=:otp, otpgeneratedate=:otpgeneratedate where seq = :seq";
+    
+    private static $UPDATE_LOGIN_OTP = "UPDATE user set loginotp=:loginotp, loginotpgeneratedate=:loginotpgeneratedate where seq = :seq";
     public function __construct(){
        self::$db = MainDB::getInstance();
        self::$db_New = MainDB::getInstance();
@@ -428,6 +430,16 @@ where lu.userseq = :userseq";
                 $_SESSION['userlogged'] = $user;
             }
         }
+        public function updateLoginOtp(User $user){
+            $conn = self::$db_New->getConnection();
+            $stmt = $conn->prepare(self::$UPDATE_LOGIN_OTP);
+            $stmt->bindValue(':loginotp',$user->getOTP());
+            $datetime = $user->getOTPGenerateDate();
+            $stmt->bindValue(':loginotpgeneratedate',$datetime->format('Y-m-d H:i:s'));
+            $stmt->bindValue(':seq',$user->getSeq());
+            $stmt->execute();
+            $error = $stmt->errorInfo();
+        }
           public function isExist($userName){
             $conn = self::$db_New->getConnection();
             $stmt = $conn->prepare(self::$FIND_SEQ);
@@ -548,6 +560,8 @@ where lu.userseq = :userseq";
                 $otp_ = $rsItem["otp"];
                 $otpemailid_ = $rsItem["otpemailid"];
                 $otpgeneratedate_ = $rsItem["otpgeneratedate"];
+                $loginotp_ = $rsItem["loginotp"];
+                $loginotpgeneratedate_ = $rsItem["loginotpgeneratedate"];
                 $user = new User();
                 $user->setSeq($seq_);
                 $user->setFullName($fullname);
@@ -568,6 +582,8 @@ where lu.userseq = :userseq";
                 $user->setOTP($otp_);
                 $user->setOTPEmailId($otpemailid_);
                 $user->setOTPGenerateDate($otpgeneratedate_);
+                $user->setLoginOTP($loginotp_);
+                $user->setLoginOTPGenerateDate($loginotpgeneratedate_);
                 return $user;
         }
 
