@@ -1,0 +1,27 @@
+CREATE TABLE `useractions` (
+  `seq` bigint(20) NOT NULL,
+  `userseq` bigint(20) NOT NULL,
+  `dated` datetime NOT NULL,
+  `actionname` varchar(50) NOT NULL,
+  `actionvalue` varchar(250) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+--
+-- Indexes for dumped tables
+--
+
+--
+-- Indexes for table `useractions`
+--
+ALTER TABLE `useractions`
+  ADD PRIMARY KEY (`seq`);
+
+--
+-- AUTO_INCREMENT for dumped tables
+--
+
+--
+-- AUTO_INCREMENT for table `useractions`
+--
+ALTER TABLE `useractions`
+  MODIFY `seq` bigint(20) NOT NULL AUTO_INCREMENT;

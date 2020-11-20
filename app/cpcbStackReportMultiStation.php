@@ -21,6 +21,10 @@
 <?php $isShowHistory = false;
 $historicalLocationSeq = 0;
 $historicalFolderSeq = 0;
+$userSeq = 0;
+if(isset($userLogged)){
+    $userSeq = $userLogged->getSeq();
+}
 if(isset($_REQUEST["ishistory"])){
     $isShowHistory = !empty($_REQUEST["ishistory"]);
     $historicalLocationSeq = $_REQUEST["locSeq"];
@@ -190,6 +194,7 @@ var options = Highcharts.setOptions(Highcharts.theme);
 <body style="margin:0px 0px 0px 0px" class="fullBody">
 <div id="toTop">^ Back to Top</div>
 <form name="stationReportForm" id="stationReportForm" method="post" action="#">
+<input type="hidden" name="userSeq" value="<?php echo $userSeq?>"/>
 <input type="hidden" name="isMultiStation" value="1" />
 <input type="hidden" name="stationType" id="stationType" value="stack" />
 <input id="lastDataDate" type="hidden" name="lastDataDate" >

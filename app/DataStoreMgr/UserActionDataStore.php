@@ -2,7 +2,7 @@
   require_once($ConstantsArray['dbServerUrl'] ."DataStoreMgr/MainDB.php");
   require_once($ConstantsArray['dbServerUrl'] ."BusinessObjects/UserAction.php");
   require_once($ConstantsArray['dbServerUrl'] ."enums/UserActionType.php");
-  
+  require_once($ConstantsArray['dbServerUrl'] ."enums/UserActionURLType.php");
 
   class UserActionDataStore{
     
@@ -42,6 +42,49 @@
         $userAction->setActionValue($url);
         $this->saveAction($userAction);
     }
+    public function saveFetchParametersAction($params,$userSeq){
+        $userAction = new UserAction();
+        $userAction->setUserSeq($userSeq);
+        $userAction->setActionName(UserActionType::fetchparameters);
+        $paramsArr = array();
+        
+        foreach($params as $param){
+            if(strpos($param, "<br>Pres Limit")){
+                //$param = Ajnala<br>BOD-mg/l<br>Pres Limit - 100
+                $param = substr($param,0,strripos($param,"<br>"));
+            }
+            array_push($paramsArr , str_replace("<br>", " - ", $param));
+        }
+        $userAction->setActionValue(implode(" | ", $paramsArr));
+        $this->saveAction($userAction);
+    }
+    
+    public function getLogsByFromToDates($fromDate,$toDate){
+        $sql = "SELECT ua.dated,user.username,ua.actionname,ua.actionvalue from useractions ua join USER on user.seq = ua.userseq";
+        $sql .= " where ua.dated <= :toDate and ua.dated >= :fromDate order by dated ASC";
+        $conn = self::$db->getConnection();
+        $stmt = $conn->prepare($sql);
+        $stmt->bindValue(':toDate', $toDate);
+        $stmt->bindValue(':fromDate', $fromDate);
+        
+        $stmt->execute();
+        $rows = $stmt->fetchAll(PDO::FETCH_OBJ);
+        
+        if($rows == FALSE){
+            return null;
+        }
+        $responseArr = array();
+        foreach($rows as $rowStd){
+            $row = get_object_vars($rowStd);
+            if($row['actionname'] == UserActionType::openurl){
+                $row['actionvalue'] = UserActionURLType::getValue($row['actionvalue']);
+            }
+            array_push($responseArr, $row);
+        }
+        return $responseArr;
+    }
+    
+    
     public function populateObject($rsItem)
     {
         $seq_ = $rsItem["seq"];

@@ -1,5 +1,7 @@
 <?php
   require_once($ConstantsArray['dbServerUrl'] ."/Utils/CalibrationService.php");
+  require_once($ConstantsArray['dbServerUrl'] ."DataStoreMgr/UserActionDataStore.php");
+  require_once($ConstantsArray['dbServerUrl'] ."enums/UserActionURLType.php");
   Class MultiStationReportMgr{
         private static $multiStationReportMgr;
         public static function getInstance(){
@@ -380,6 +382,7 @@
             foreach($folChannelsArray as $folSeq => $folChannelChannelsArr){
                  $folName = $foldersObjArray[$folSeq]->getFolderName();
 				 $stationName = $foldersObjArray[$folSeq]->getStationName();
+				 $stationName = $foldersObjArray[$folSeq]->getIndustryName() ." - ". $stationName;
 				 $sName = $stationName;
                  $CCDS = ChannelConfigurationDataStore::getInstance();
                  $ChannelsInfo = $CCDS->FindByFolderAndChannelNos($folSeq,$folChannelChannelsArr);
@@ -516,6 +519,8 @@
                 	$dataJSON = $finalDataJSON;
                 }
                 $dataJSON =  self::getAvgMinMaxValues($dataJSON);
+                $UADS = UserActionDataStore::getInstance();
+                $UADS->saveFetchParametersAction($dataJSON['channels'], $_GET["userSeq"]);
                 return $dataJSON;
             }
 		}

@@ -1,7 +1,10 @@
 <?php
+require_once("IConstants.inc");
 require_once($ConstantsArray['dbServerUrl'] ."DataStoreMgr/UserDataStore.php");
 require_once($ConstantsArray['dbServerUrl'] . "FormValidator//validator.php");
 require_once($ConstantsArray['dbServerUrl'] . "Utils//StringUtils.php");
+require_once($ConstantsArray['dbServerUrl'] ."Managers/UserMgr.php");
+
 
 $div = "";
 $message="";
@@ -35,18 +38,26 @@ if($submit<>""){
                   if($user->getIsActive() == 0){
                     $messageText = "Invalid Execution";
                   }else{
-                      session_start();
-                      $_SESSION["userlogged"] = $user;
-                      if(isset($_SESSION['httpUrl'])){
-                         header("Location:". $_SESSION['httpUrl']);
-                      }else{
-                          if($user->getSeq() == 206){
-                              header("Location:cpcbStackReportMultiStation_raymond.php");
-                          }else{
-                             header("Location:cpcbStackReportMultiStation.php");
-                          }
-                        
+                      $usrMgr = UserMgr::getInstance();
+                      $bool = $usrMgr->createAndSendLoginOTP($user);
+                      $bool = 1;
+                      if($bool){
+                          session_start();
+                          $_SESSION["userseq"] = $user->getSeq();
+                          header("Location:otpform.php");
+                          //header("Location:cpcbStackReportMultiStation.php");
                       }
+                      return;
+//                       if(isset($_SESSION['httpUrl'])){
+//                          header("Location:". $_SESSION['httpUrl']);
+//                       }else{
+//                           if($user->getSeq() == 206){
+//                               header("Location:cpcbStackReportMultiStation_raymond.php");
+//                           }else{
+//                              header("Location:cpcbStackReportMultiStation.php");
+//                           }
+                        
+//                       }
                   }
 
               }else{

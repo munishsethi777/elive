@@ -14,7 +14,11 @@
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
     "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en">
-<? $menuItem = "reportEFFLUENTMenu";?>
+<? $menuItem = "reportEFFLUENTMenu";
+$userSeq = 0;
+if(isset($userLogged)){
+    $userSeq = $userLogged->getSeq();
+}?>
 <?include("cpcbHeader.php");?>
 <?include("cpcbMenu.php")?>
 <head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
@@ -79,7 +83,7 @@ var options = Highcharts.setOptions(Highcharts.theme);
             submitReport(this.value);
         });
         $('.calibrationLink').click(function (){
-            var caliHTML = '<table width="787" border="1" cellspacing="2" cellpadding="2">    <tr style="font-weight:bold">      <td width="20">Calibration Type</td>      <td width="20">JSPL - Raigarh</td>      <td width="20">ACC - Gagal</td>      <td width="20">ITC 1</td>      <td width="20">ITC 2</td>      <td width="20">ITC 3</td>      <td width="20">ITC 4</td>    </tr>    <tr>      <td>ZERO</td>      <td>0 µg/m3</td>      <td>0 µg/m3</td>      <td>0 µg/m3</td>      <td>0 µg/m3</td>      <td>0 µg/m3</td>      <td>0 µg/m3</td>    </tr>    <tr>      <td>SPAN - CO</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>    </tr>    <tr>      <td>SPAN - SO2</td>      <td>1144 µg/m3</td>      <td>1144 µg/m3</td>      <td>1144 µg/m3</td>      <td>1144 µg/m3</td>      <td>1144 µg/m3</td>      <td>1144 µg/m3</td>    </tr>    <tr>      <td>SPAN - NOx</td>      <td>756 µg/m3</td>      <td>756 µg/m3</td>      <td>756 µg/m3</td>      <td>756 µg/m3</td>      <td>756 µg/m3</td>      <td>756 µg/m3</td>    </tr>    <tr>      <td>SPAN - Ozone</td>      <td>n.a</td>      <td>n.a</td>      <td>343 µg/m3</td>      <td>343 µg/m3</td>      <td>429 µg/m3</td>      <td>343 µg/m3</td>    </tr>  </table>';
+            var caliHTML = '<table width="787" border="1" cellspacing="2" cellpadding="2">    <tr style="font-weight:bold">      <td width="20">Calibration Type</td>      <td width="20">JSPL - Raigarh</td>      <td width="20">ACC - Gagal</td>      <td width="20">ITC 1</td>      <td width="20">ITC 2</td>      <td width="20">ITC 3</td>      <td width="20">ITC 4</td>    </tr>    <tr>      <td>ZERO</td>      <td>0 ï¿½g/m3</td>      <td>0 ï¿½g/m3</td>      <td>0 ï¿½g/m3</td>      <td>0 ï¿½g/m3</td>      <td>0 ï¿½g/m3</td>      <td>0 ï¿½g/m3</td>    </tr>    <tr>      <td>SPAN - CO</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>      <td>50 mg/m3</td>    </tr>    <tr>      <td>SPAN - SO2</td>      <td>1144 ï¿½g/m3</td>      <td>1144 ï¿½g/m3</td>      <td>1144 ï¿½g/m3</td>      <td>1144 ï¿½g/m3</td>      <td>1144 ï¿½g/m3</td>      <td>1144 ï¿½g/m3</td>    </tr>    <tr>      <td>SPAN - NOx</td>      <td>756 ï¿½g/m3</td>      <td>756 ï¿½g/m3</td>      <td>756 ï¿½g/m3</td>      <td>756 ï¿½g/m3</td>      <td>756 ï¿½g/m3</td>      <td>756 ï¿½g/m3</td>    </tr>    <tr>      <td>SPAN - Ozone</td>      <td>n.a</td>      <td>n.a</td>      <td>343 ï¿½g/m3</td>      <td>343 ï¿½g/m3</td>      <td>429 ï¿½g/m3</td>      <td>343 ï¿½g/m3</td>    </tr>  </table>';
             TINY.box.show({html:caliHTML,animate:true,close:true,boxid:'success'});
         });
         $('.naaqsLink').click(function (){
@@ -161,6 +165,8 @@ var options = Highcharts.setOptions(Highcharts.theme);
 <body style="margin:0px 0px 0px 0px" class="fullBody">
 <div id="toTop">^ Back to Top</div>
 <form name="stationReportForm" id="stationReportForm" method="POST" action="#">
+<input type="hidden" name="userSeq" value="<?php echo $userSeq?>"/>
+
 <input type="hidden" name="isMultiStation" value="1" />
 <input type="hidden" name="stationType" id="stationType" value="stack" />
 <input type="hidden" name="stationType2" id="stationType2" value="effluent" />

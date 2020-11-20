@@ -1,4 +1,7 @@
-<?include("_jsIncludeCpcb.php");?>
+<?include("_jsIncludeCpcb.php");
+require_once($ConstantsArray['dbServerUrl'] ."DataStoreMgr/UserActionDataStore.php");
+require_once($ConstantsArray['dbServerUrl'] ."enums/UserActionURLType.php");
+?>
 <style>
 .stationReportTable td{
     padding:4px;
@@ -12,6 +15,12 @@ $userName = "";
 if(isset($_SESSION["userlogged"])){
     $user = $_SESSION["userlogged"];
     $userName = $user->getUserName();
+    
+    $curPageName = substr($_SERVER["SCRIPT_NAME"],strrpos($_SERVER["SCRIPT_NAME"],"/")+1);
+    $curPageName = str_replace(".php","",$curPageName);
+    $UADS = UserActionDataStore::getInstance();
+    $UADS->saveURLOpenAction($curPageName, $user->getSeq());
+    
 }
 
 if ($userName == "jk"){ ?>
