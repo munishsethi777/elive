@@ -1,0 +1,1 @@
+ALTER TABLE `user` ADD `loginotp` VARCHAR(20) NULL AFTER `otpgeneratedate`, ADD `loginotpgeneratedate` DATETIME NULL AFTER `loginotp`;

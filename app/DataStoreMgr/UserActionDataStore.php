@@ -8,7 +8,7 @@
     
     private static $db;
     private static $userActionDataStore;
-    private Static $INSERT = "INSERT INTO `useractions` (userseq,dated,actionname,actionvalue) VALUES(:userseq,:dated,:actionname,:actionvalue)";
+    private Static $INSERT = "INSERT INTO `useractions` (userseq,dated,actionname,actionvalue,ipaddress) VALUES(:userseq,:dated,:actionname,:actionvalue,:ipaddress)";
     public function __construct(){
         self::$db = MainDB::getInstance();
     }
@@ -31,6 +31,7 @@
         $stmt->bindValue(':dated', $dateTime->format('Y-m-d H:i:s'));
         $stmt->bindValue(':actionname', $userAction->getActionName());
         $stmt->bindValue(':actionvalue', $userAction->getActionValue());
+        $stmt->bindValue(':ipaddress', $userAction->getIPAddress());
         $stmt->execute();
         $error = $stmt->errorInfo();
     }
@@ -40,6 +41,7 @@
         $userAction->setUserSeq($userSeq);
         $userAction->setActionName(UserActionType::openurl);
         $userAction->setActionValue($url);
+        $userAction->setIpAddress($_SERVER['REMOTE_ADDR']);
         $this->saveAction($userAction);
     }
     public function saveFetchParametersAction($params,$userSeq){
@@ -60,7 +62,7 @@
     }
     
     public function getLogsByFromToDates($fromDate,$toDate,$managerSeq){
-        $sql = "select ua.dated,user.username,ua.actionname,ua.actionvalue from useractions ua
+        $sql = "select ua.dated,ua.ipaddress,user.emailid,user.username,ua.actionname,ua.actionvalue from useractions ua
                 join user on ua.userseq = user.seq
                 join locationusers on locationusers.userseq = user.seq
                 where locationusers.locationseq in

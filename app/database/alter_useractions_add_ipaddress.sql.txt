@@ -1,0 +1,1 @@
+ALTER TABLE `useractions` ADD `ipaddress` VARCHAR(20) NULL AFTER `actionvalue`;

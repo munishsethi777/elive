@@ -986,11 +986,13 @@ public static function exportCPCBReport($rows,$from,$to,$isSendEmail = false){
             $objPHPExcel->setActiveSheetIndex(0)->setCellValue("A1", "Access Logs From " . $from . " to " . $to);
             $objPHPExcel->setActiveSheetIndex(0)->setCellValue("A2", "S.No");
             $objPHPExcel->setActiveSheetIndex(0)->setCellValue("B2", "Dated");
-            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("C2", "User");
-            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("D2", "Action");
-            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("E2", "Action Value");
-            $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:E2')->getFont()->setBold(true);
-            $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:E2')
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("C2", "IP Address");
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("D2", "Email");
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("E2", "User");
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("F2", "Action");
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue("G2", "Action Value");
+            $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:G2')->getFont()->setBold(true);
+            $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:G2')
             ->getFill()
             ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
             ->getStartColor()
@@ -1011,7 +1013,7 @@ public static function exportCPCBReport($rows,$from,$to,$isSendEmail = false){
             $rowCount++;
         }
         $objPHPExcel->getActiveSheet()->setTitle('Access Logs');
-        $objPHPExcel->getActiveSheet()->mergeCells("A1:E1");
+        $objPHPExcel->getActiveSheet()->mergeCells("A1:G1");
         $objPHPExcel->setActiveSheetIndex(0);
         if($isSendEmail){
             ob_start();
@@ -1022,7 +1024,7 @@ public static function exportCPCBReport($rows,$from,$to,$isSendEmail = false){
             return $excelOutput;
         }else{
             header('Content-Type: application/vnd.ms-excel');
-            header('Content-Disposition: attachment;filename="HighValueLogs.xls"');
+            header('Content-Disposition: attachment;filename="AccessLogs.xls"');
             header('Cache-Control: max-age=0');
             header('Cache-Control: max-age=1');
             header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past

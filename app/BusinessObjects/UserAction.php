@@ -1,7 +1,7 @@
 <?php
  class UserAction{
     
-    private $seq,$userseq,$dated,$actionname,$actionvalue;
+    private $seq,$userseq,$dated,$actionname,$actionvalue,$ipaddress;
     
     public function setSeq($val){
         $this->seq = $val;
@@ -32,6 +32,12 @@
     }
     public function getActionValue(){
         return $this->actionvalue;
+    }
+    public function setIpAddress($val){
+        $this->ipaddress = $val;
+    }
+    public function getIpAddress(){
+        return $this->ipaddress;
     }
     
 }

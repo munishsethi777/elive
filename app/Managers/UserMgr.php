@@ -40,6 +40,27 @@ Class UserMgr{
         }
         return true;
     }
+    public function sendLoginSuccessEmail($user){
+        $UDS = UserDataStore::getInstance();
+        $phAnValues = array();
+        $phAnValues["USER"] = $user->getUserName();
+        $phAnValues["IPADDRESS"] = $_SERVER['REMOTE_ADDR'];
+        $content = file_get_contents(StringConstants::$applicationPath ."/EmailTemplates/loginsuccess.html");
+        $content = MailerUtils::replacePlaceholders($phAnValues,$content);
+        $to = $user->getEmailId();
+        $cc = null;
+        if(StringConstants::isLoginEmailCC == 1){
+            $cc = StringConstants::loginEmailCC;
+        }
+        $subject = "Successful login at EnvirotechLive.com";
+        $headers = "From: noreply@envirotechlive.com";
+        $from = "noreply@envirotechlive.com";
+        $result = MailerUtils::sendEmailNew($to,$from,$subject,$content,$cc);
+        if(!$result){
+            throw new Exception("Mail Sent Failed");
+        }
+        return true;
+    }
     
 }
 ?>

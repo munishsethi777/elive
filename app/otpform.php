@@ -6,7 +6,7 @@ require_once($ConstantsArray['dbServerUrl'] . "FormValidator//validator.php");
 require_once($ConstantsArray['dbServerUrl'] . "Utils//StringUtils.php");
 require($ConstantsArray['dbServerUrl'] . "Utils//MailerUtils.php");
 require_once($ConstantsArray['dbServerUrl'] . "enums//UserActionType.php");
-
+require_once($ConstantsArray['dbServerUrl'] ."Managers/UserMgr.php");
 
 $div = "";
 $message="";
@@ -56,8 +56,12 @@ if($submit<>""){
                     }
                     $userAction = new UserAction();
                     $userAction->setUserSeq($user->getSeq());
+                    $userAction->setIpAddress($_SERVER['REMOTE_ADDR']);
                     $userAction->setActionName(UserActionType::login);
                     $UADS->saveAction($userAction);
+                    $usrMgr = UserMgr::getInstance();
+                    $bool = $usrMgr->sendLoginSuccessEmail($user);
+                    
                     session_start();
                     $_SESSION["userlogged"] = $user;
                     if (isset($_SESSION['httpUrl'])) {
