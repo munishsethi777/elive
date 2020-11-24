@@ -5,7 +5,8 @@
 	require_once($ConstantsArray['dbServerUrl'] . "Utils/ExportUtils.php");
     require_once($ConstantsArray['dbServerUrl'] ."DataStoreMgr/UserActionDataStore.php");
 	
-	$managerSession = $_SESSION["managerSession"]; 
+	$managerSession = $_SESSION["managerSession"];
+	$managerSeq = $managerSession["seq"];
 	$isSuccess = false;
 
 	if(isset($_POST["call"])){
@@ -28,9 +29,10 @@
                 $UADS = UserActionDataStore::getInstance();
                 $toDateObj = new DateTime($toDateStr);
                 $fromDateObj = new DateTime($fromDateStr);
+                $toDateObj = $toDateObj->modify('+1 day');
                 $toDateStr = $toDateObj->format("Y/m/d  H:i:s");
                 $fromDateStr = $fromDateObj->format("Y/m/d  H:i:s");
-                $userActions = $UADS->getLogsByFromToDates($fromDateStr, $toDateStr);
+                $userActions = $UADS->getLogsByFromToDates($fromDateStr, $toDateStr,$managerSeq);
                 ExportUtils::exportSystemAccessLogReport($userActions, $fromDateStr, $toDateStr);
 			}else{
                 $notificationUtil->generateReportInstant($toDateStr, $type);

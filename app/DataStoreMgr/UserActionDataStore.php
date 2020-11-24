@@ -59,9 +59,14 @@
         $this->saveAction($userAction);
     }
     
-    public function getLogsByFromToDates($fromDate,$toDate){
-        $sql = "SELECT ua.dated,user.username,ua.actionname,ua.actionvalue from useractions ua join USER on user.seq = ua.userseq";
-        $sql .= " where ua.dated <= :toDate and ua.dated >= :fromDate order by dated ASC";
+    public function getLogsByFromToDates($fromDate,$toDate,$managerSeq){
+        $sql = "select ua.dated,user.username,ua.actionname,ua.actionvalue from useractions ua
+                join user on ua.userseq = user.seq
+                join locationusers on locationusers.userseq = user.seq
+                where locationusers.locationseq in
+                (select lu.locationseq from locationusers lu where lu.userseq = $managerSeq)
+                and ua.dated <= :toDate and ua.dated >= :fromDate GROUP by ua.seq order by ua.dated ASC ";
+        
         $conn = self::$db->getConnection();
         $stmt = $conn->prepare($sql);
         $stmt->bindValue(':toDate', $toDate);
