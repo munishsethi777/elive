@@ -48,6 +48,7 @@
         $userAction = new UserAction();
         $userAction->setUserSeq($userSeq);
         $userAction->setActionName(UserActionType::fetchparameters);
+        $userAction->setIpAddress($_SERVER['REMOTE_ADDR']);
         $paramsArr = array();
         
         foreach($params as $param){
