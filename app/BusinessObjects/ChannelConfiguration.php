@@ -1,7 +1,7 @@
 <?php
 
   Class ChannelConfiguration{
-     private $seq,$folderSeq,$channelNumber,$channelName,$channelStatusFlag,$channelUnit,$channelStation, $prescribedlimit, $isVisible,$deviceid;
+     private $seq,$folderSeq,$channelNumber,$channelName,$channelStatusFlag,$channelUnit,$channelStation, $prescribedlimit, $isVisible,$isCpcb,$deviceid;
 	 private $channelrealname,$prescribedlowlimit,$createdon,$lastmodifiedon,$isstatus,$statuschno; 
 
      public function setSeq($seq_){
@@ -66,6 +66,13 @@
      public function getIsVisible(){
         return $this->isVisible;
      }
+     public function setIsCpcb($val_){
+         $this->isCpcb = $val_;
+     }
+     public function getIsCpcb(){
+         return $this->isCpcb;
+     }
+     
   
       public function setDeviceId($val){
           $this->deviceid = $val;

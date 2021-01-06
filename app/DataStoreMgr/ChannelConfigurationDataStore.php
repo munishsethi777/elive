@@ -10,8 +10,8 @@
   class ChannelConfigurationDataStore  {
     private static $CCDataStore;
     private static $db;
-    private static $INSERT = "insert into channelconfiguration (folderseq,channelnumber,channelname,channelstatusflag,channelstation,channelunit,prescribedlimit,isvisible,deviceid,channelrealname,prescribedlowlimit,createdon,lastmodifiedon,isstatus,statuschno) values(:folderseq,:channelnumber,:channelname,:channelstatusflag,:channelstation,:channelunit,:prescribedlimit,:isvisible,:deviceid,:channelrealname,:prescribedlowlimit,:createdon,:lastmodifiedon,:isstatus,:statuschno)";
-    private static $UPDATE = "update channelconfiguration set folderseq=:folderseq,channelnumber=:channelnumber, channelname = :channelname,channelstatusflag=:channelstatusflag,channelunit=:channelunit,channelstation= :channelstation, prescribedlimit=:prescribedlimit, isvisible=:isvisible, deviceid=:deviceid,channelrealname=:channelrealname,prescribedlowlimit=:prescribedlowlimit, lastmodifiedon=:lastmodifiedon,isstatus=:isstatus,statuschno=:statuschno  where configseq=:configseq ";
+    private static $INSERT = "insert into channelconfiguration (folderseq,channelnumber,channelname,channelstatusflag,channelstation,channelunit,prescribedlimit,isvisible,iscpcb,deviceid,channelrealname,prescribedlowlimit,createdon,lastmodifiedon,isstatus,statuschno) values(:folderseq,:channelnumber,:channelname,:channelstatusflag,:channelstation,:channelunit,:prescribedlimit,:isvisible,:iscpcb,:deviceid,:channelrealname,:prescribedlowlimit,:createdon,:lastmodifiedon,:isstatus,:statuschno)";
+    private static $UPDATE = "update channelconfiguration set folderseq=:folderseq,channelnumber=:channelnumber, channelname = :channelname,channelstatusflag=:channelstatusflag,channelunit=:channelunit,channelstation= :channelstation, prescribedlimit=:prescribedlimit, isvisible=:isvisible,iscpcb=:iscpcb, deviceid=:deviceid,channelrealname=:channelrealname,prescribedlowlimit=:prescribedlowlimit, lastmodifiedon=:lastmodifiedon,isstatus=:isstatus,statuschno=:statuschno  where configseq=:configseq ";
     private static $FINDBYFOLDERSEQ = "select * from channelconfiguration where folderseq = :folderseq";
     private static $FIND_CH_NAME_BY_FOLDER_SEQ = "select channelname,channelnumber from channelconfiguration where folderseq = :folderseq";
      private static $FIND_CH_STATUS_BY_FOLDER_SEQ = "select channelname,channelnumber,statuschno from channelconfiguration where folderseq = :folderseq and isstatus = 1";
@@ -154,11 +154,12 @@
         $stmt->bindValue(':channelunit', $cc->getChannelUnit());
         $stmt->bindValue(':prescribedlimit', $cc->getPrescribedLimit());
         $stmt->bindValue(':isvisible', $cc->getIsVisible());
+        $stmt->bindValue(':iscpcb', $cc->getIsCpcb());
         $stmt->bindValue(':isstatus', $cc->getIsStatus());
         $stmt->bindValue(':deviceid', $cc->getDeviceId());
         $stmt->bindValue(':channelrealname', $cc->getChannelRealName());
         $stmt->bindValue(':prescribedlowlimit', $cc->getPrescribedLowLimit());
-        $stmt->bindValue(':statuschno', $cc->getStatusChNo());
+        $stmt->bindValue(':statuschno', $cc->getStatusChNo()? $cc->getStatusChNo() : 0);
         $currDate = new DateTime();
         $currDate = $currDate->format('Y-m-d H:i:s');
         $stmt->bindValue(':lastmodifiedon', $currDate);
@@ -422,6 +423,7 @@
         $channelRealName = $rsItem["channelrealname"];
         $prescribedLowLimit_ = $rsItem["prescribedlowlimit"];
         $isVisible_ = $rsItem["isvisible"];
+        $isCpcb_ = $rsItem["iscpcb"];
         $statusChNo = $rsItem["statuschno"];
         $isStatus = $rsItem["isstatus"];
         
@@ -436,6 +438,7 @@
         $cc->setPrescribedLimit($prescribedLimit_);
         $cc->setPrescribedLowLimit($prescribedLowLimit_);
         $cc->setIsVisible($isVisible_);
+        $cc->setIsCpcb($isCpcb_);
         $cc->setDeviceId($deviceID);
         $cc->setChannelRealName($channelRealName);
         $cc->setStatusChNo($statusChNo);

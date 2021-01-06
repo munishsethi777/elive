@@ -110,6 +110,7 @@ if(!empty($_POST["action"]) && ($_POST["action"] == "update"))
             $isStatus = $_POST["isstatus".$count];
             $statusChNo = $_POST["statuschno".$count];
             $isVisible = $_POST["isVisible".$count];
+            $isCpcb = $_POST["isCpcb".$count];
             $chConfigObj->setChannelName($chName);
             $chConfigObj->setChannelRealName($chRealName);
             $chConfigObj->setChannelNumber($chNo);
@@ -134,7 +135,13 @@ if(!empty($_POST["action"]) && ($_POST["action"] == "update"))
             }else{
                 $isStatus = 0;
             }
+            if($isCpcb == "on"){
+                $isCpcb = 1;
+            }else{
+                $isCpcb = 0;
+            }
             $chConfigObj->setIsVisible($isVisible);
+            $chConfigObj->setIsCpcb($isCpcb);
             $chConfigObj->setIsStatus($isStatus);
             $chConfigObj->setStatusChNo($statusChNo);
             if(!empty($chseq)){
@@ -237,7 +244,8 @@ function checkChNoUniqueValidation(){
                                            <th width="5%">Prescribed Low Limit</th>
                                            <th width="4%">Status</th>
                                            <th width="6%">Status Ch No.</th>
-                                            <th width="4%">Visible</th>
+                                           <th width="4%">Visible</th>
+                                           <th width="4%">Cpcb</th>
                                          </tr>
                                      </thead>
                                      <tbody>
@@ -246,9 +254,13 @@ function checkChNoUniqueValidation(){
                                      <?foreach($channlConfigs as $ch){
                                          $index++;
                                          $checked = "";
+                                         $checkedCpcb = "";
                                          $statusChecked = "";
                                          if($ch->getIsVisible() == 1){
                                             $checked = "checked";
+                                         }
+                                         if($ch->getIsCpcb()== 1){
+                                             $checkedCpcb = "checked";
                                          }
                                          if($ch->getIsStatus() == 1){
                                              $statusChecked = "checked";
@@ -267,6 +279,7 @@ function checkChNoUniqueValidation(){
                                              <td><input class="checkbox-inline i-checks" name="isstatus<?echo $index?>" type="checkbox" <?echo $statusChecked?>></td>
                                              <td><input class="form-control" name="statuschno<?php echo $index?>" type="text" size="1" value="<?echo $ch->getStatusChNo()?>" ></td>
                                              <td><input class="checkbox-inline i-checks" name="isVisible<?echo $index?>" type="checkbox" <?echo $checked?>></td>
+                                             <td><input class="checkbox-inline i-checks" name="isCpcb<?echo $index?>" type="checkbox" <?echo $checkedCpcb?>></td>
                                              <td><a href='javascript:Delete(<?echo $ch->getSeq()?>)' title='Delete'>
                                                 	<img src='images/delete.png'  border='0'/>
                                               </a></td>
