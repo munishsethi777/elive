@@ -43,8 +43,8 @@ class BPCBService {
         $params = array();
         $lastSyncedSeq = 0;
         foreach ( $channels as $channel ) {
-            $isVisible = $channel->getIsVisible ();
-            if (empty ( $isVisible )) {
+            $isCpcb = $channel->getIsCpcb ();
+            if (empty ( $isCpcb )) {
                 continue;
             }
             $paramsMainArr = array ();

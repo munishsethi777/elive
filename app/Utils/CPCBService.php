@@ -132,8 +132,8 @@ class CPCBService {
 		$diagnosticsMainArr = array ();
 		$updatedTill=null;
 		foreach ( $channels as $channel ) {
-			$isVisible = $channel->getIsVisible ();
-			if (empty ( $isVisible )) {
+		      $isCpcb = $channel->getIsCpcb ();
+			if (empty ( $isCpcb )) {//new variable to make sure its a cpcb parameter or not
 				continue;
 			}
 			$paramsMainArr = array ();

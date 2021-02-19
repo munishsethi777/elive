@@ -43,10 +43,10 @@ class HRPCBService {
 		$params = array(); 
 		$lastSyncedSeq = 0;
 		foreach ( $channels as $channel ) {
-			$isVisible = $channel->getIsVisible ();
-			if (empty ( $isVisible )) {
-				continue;
-			}
+		      $isCpcb = $channel->getIsCpcb ();
+            if (empty ( $isCpcb )) {
+                continue;
+            }
 			$paramsMainArr = array ();
 			$deviceId = $channel->getDeviceId();
 			$deviceId = str_replace(" ", "", $deviceId);
