@@ -1036,5 +1036,73 @@ public static function exportCPCBReport($rows,$from,$to,$isSendEmail = false){
             $objWriter->save('php://output'); 
         }
     }
+    public static function exportNewHighValueRemidnersLogReport($rows,$from,$to,$isSendEmail = false){ // of cpcb officials mobile numbers etc
+        $objPHPExcel = new PHPExcel();
+        // Set document properties
+        $objPHPExcel->getProperties()->setCreator("Manager")
+        ->setLastModifiedBy("Manager")
+        ->setTitle("Office 2007 XLSX Test Document")
+        ->setSubject("Office 2007 XLSX Test Document")
+        ->setDescription("High Value Logs")
+        ->setKeywords("office 2007 openxml php")
+        ->setCategory("High Value Reminder Logs");
+        $alphas = range('A', 'Z');
+        $rowCount = 1;
+        $count = 0;
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("A1", "Access Logs From " . $from . " to " . $to);
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("A2", "S.No");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("B2", "Name");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("C2", "Mobile");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("D2", "Email");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("E2", "Official Department");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("F2", "TimeStampt of SMS send");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("G2", "No. of sms sent");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("H2", "Outlet Name");
+        $objPHPExcel->setActiveSheetIndex(0)->setCellValue("I2", "Parameter Name");
+        $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:I2')->getFont()->setBold(true);
+        $objPHPExcel->setActiveSheetIndex(0)->getStyle('A2:I2')
+        ->getFill()
+        ->setFillType(PHPExcel_Style_Fill::FILL_SOLID)
+        ->getStartColor()
+        ->setRGB('D3D3D3');
+    
+        $count = 3;
+        foreach($rows as $row){
+            $i = 0;
+            $colName = $alphas[$i]. $count;
+            $objPHPExcel->setActiveSheetIndex(0)->setCellValue($colName, $rowCount);
+            $i++;
+            foreach($row as $col=>$value){
+                $colName = $alphas[$i]. $count;
+                $objPHPExcel->setActiveSheetIndex(0)->setCellValue($colName, $value);
+                $i++;
+            }
+            $count++;
+            $rowCount++;
+        }
+        $objPHPExcel->getActiveSheet()->setTitle('High Value Reminders Logs');
+        $objPHPExcel->getActiveSheet()->mergeCells("A1:I1");
+        $objPHPExcel->setActiveSheetIndex(0);
+        if($isSendEmail){
+            ob_start();
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            $objWriter->save('php://output');
+            $excelOutput = ob_get_contents();
+            ob_end_clean();
+            return $excelOutput;
+        }else{
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="HighValueRemindersLogs.xls"');
+            header('Cache-Control: max-age=0');
+            header('Cache-Control: max-age=1');
+            header ('Expires: Mon, 26 Jul 1997 05:00:00 GMT'); // Date in the past
+            header ('Last-Modified: '.gmdate('D, d M Y H:i:s').' GMT'); // always modified
+            header ('Cache-Control: cache, must-revalidate'); // HTTP/1.1
+            //header ('Pragma: public'); // HTTP/1.0
+            $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel5');
+            //ob_end_clean();
+            $objWriter->save('php://output');
+        }
+    }
 }
 ?>

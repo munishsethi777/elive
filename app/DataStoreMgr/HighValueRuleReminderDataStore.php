@@ -4,6 +4,8 @@
    require_once($ConstantsArray['dbServerUrl'] ."/BusinessObjects//HighValueRuleReminder.php");
    require_once($ConstantsArray['dbServerUrl'] ."/DataStoreMgr//HighValueRuleReminderSMSDataStore.php");
    require_once($ConstantsArray['dbServerUrl'] ."/Utils/FilterUtil.php");
+   require_once($ConstantsArray['dbServerUrl'] ."/Utils/CPCBUtils.php");
+    
    
    require_once("MainDB.php");
 
@@ -561,6 +563,68 @@ from highvaluerulereminder hr inner join folder f on hr.folderseq = f.seq inner 
            }
            $hvrRem->setIsHighValue($row['ishighvalue']);
            return $hvrRem;
+       }
+       
+       public function getNewHighValueRemindersLogsForExport($fromDateStr, $toDateStr,$managerSeq){ //cpcb format
+           //name,mobile,email,depart,sms sent on, total sms, outlet names, parameter names
+           $sql = "select hvrr.issent, hvrr.seq reminderseq,channelconfiguration.channelname,f.seq, f.industryname,f.stationname, hvrr.reminderdate, hvrr.remindermobile, 
+                    hvrr.reminderemail, hvrr.highvalue from highvaluerulereminder hvrr left join folder f on f.seq = hvrr.folderseq
+                    inner join highvaluerule hrv on hvrr.highvalueruleseq = hrv.seq left join virtualchannelconfiguration vcc on  hrv.virtualchannelseq = vcc.configseq
+                    left join channelconfiguration on channelconfiguration.channelnumber = hvrr.highvaluechannelno and channelconfiguration.folderseq = f.seq 
+                    join location on location.seq = f.locationseq
+                    join locationusers on locationusers.locationseq = location.seq
+                    where locationusers.locationseq in (select lu.locationseq from locationusers lu where lu.userseq = $managerSeq)
+                    and hvrr.reminderdate >= '$fromDateStr' and hvrr.reminderdate <= '$toDateStr' 
+                    and hvrr.issent = 1
+                    order by hvrr.reminderdate asc";
+           $conn = self::$db->getConnection();
+           $stmt = $conn->prepare($sql);
+           $stmt->execute();
+           $error = $stmt->errorInfo();
+           $rows = $stmt->fetchAll(PDO::FETCH_ASSOC);
+           $mobileNumberKeyArr = array();
+           foreach($rows as $row){
+               $dataRow = array(
+                    "channelname"=> $row["channelname"],
+                    "highvalue"=>$row["highvalue"],
+                    "industryname"=>$row["industryname"],
+                    "stationname"=>$row["stationname"],
+                    "reminderdate"=>$row["reminderdate"]
+               );
+               
+               $reminderMobiles = str_replace(' ', '', $row["remindermobile"]);
+               $reminderMobiles = rtrim($reminderMobiles, ',');
+               $reminderMobilesArr = explode(",", $reminderMobiles);
+               if(count($reminderMobilesArr)>1){
+                   foreach($reminderMobilesArr as $reminderMobile){
+                       if(!isset($mobileNumberKeyArr[$reminderMobile])){
+                           $mobileNumberKeyArr[$reminderMobile] = array();
+                       }
+                       $nameEmail = CPCBUtils::getNameEmailByMobileNumber($reminderMobile);
+                       $dataRow["name"] = $nameEmail["name"];
+                       $dataRow["email"] = $nameEmail["email"];
+                       $dataRow["department"] = $nameEmail["department"];
+                       
+                       array_push($mobileNumberKeyArr[$reminderMobile],$dataRow);
+                   }
+               }
+           }
+           $newArr = array();
+           foreach($mobileNumberKeyArr as $mobile => $mobileDataArr){
+               foreach($mobileDataArr as $data){
+                   $childArr = array();
+                   $childArr['name'] = $data['name'];
+                   $childArr['mobile'] = $mobile;
+                   $childArr['email'] = $data['email'];
+                   $childArr['department'] = $data['department'];
+                   $childArr['timestampSMSSent'] = $data['reminderdate'];
+                   $childArr['totalSMS'] = 1;
+                   $childArr['outletName'] = $data["industryname"]." - ". $data['stationname'];
+                   $childArr['parameterName'] = $data['channelname'];
+                   array_push($newArr, $childArr);
+               }
+           }
+           return $newArr;
        }
  }
 ?>
